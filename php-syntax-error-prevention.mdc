@@ -1,0 +1,211 @@
+---
+description: PHP Syntax Error Prevention - Prevent common PHP syntax errors and parse errors
+globs: **/*.php
+---
+
+# PHP Syntax Error Prevention
+
+## Critical Rules
+
+### 1. Always Check Syntax Before Committing
+- **Run PHP syntax check**: `php -l filename.php` before saving
+- **Use IDE syntax highlighting**: Ensure IDE shows no red underlines
+- **Test file inclusion**: Verify `require_once` paths are correct
+- **Check closing tags**: Ensure all `<?php` tags have matching `?>` or are omitted
+
+### 2. Common Syntax Errors to Avoid
+
+#### Missing Semicolons
+```php
+// ❌ WRONG
+$var = 'value'
+echo $var
+
+// ✅ CORRECT
+$var = 'value';
+echo $var;
+```
+
+#### Unclosed Quotes/Brackets
+```php
+// ❌ WRONG
+$sql = "SELECT * FROM matches WHERE id = :id";
+$stmt = $db->prepare($sql;
+
+// ✅ CORRECT
+$sql = "SELECT * FROM matches WHERE id = :id";
+$stmt = $db->prepare($sql);
+```
+
+#### Array Syntax Errors
+```php
+// ❌ WRONG
+$array = ['key' => 'value', 'key2' => 'value2',];
+
+// ✅ CORRECT (trailing comma OK in PHP 7.2+)
+$array = ['key' => 'value', 'key2' => 'value2'];
+```
+
+#### Function Call Errors
+```php
+// ❌ WRONG
+function getData($id {
+    return $data;
+}
+
+// ✅ CORRECT
+function getData($id) {
+    return $data;
+}
+```
+
+### 3. File Structure Requirements
+
+#### Opening PHP Tag
+- **Always start with `<?php`** (not `<?`)
+- **Never use closing `?>` tag** in pure PHP files (prevents whitespace issues)
+- **Exception**: Only use `?>` in template files that mix PHP and HTML
+
+#### Include/Require Paths
+```php
+// ✅ CORRECT - Use __DIR__ for relative paths
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../classes/Match.php';
+
+// ❌ WRONG - Hardcoded paths
+require_once '/var/www/cricapp/includes/config.php';
+```
+
+### 4. Variable and Function Naming
+
+#### Valid PHP Identifiers
+- Start with letter or underscore
+- Followed by letters, numbers, or underscores
+- Case-sensitive
+
+```php
+// ✅ CORRECT
+$matchId = 123;
+$team_name = 'India';
+$_private = true;
+
+// ❌ WRONG
+$123match = 'invalid';
+$match-id = 'invalid';
+$match.id = 'invalid';
+```
+
+### 5. String Concatenation
+
+```php
+// ✅ CORRECT
+$message = 'Hello ' . $name . '!';
+$sql = "SELECT * FROM matches WHERE id = " . (int)$matchId;
+
+// ❌ WRONG - Missing concatenation operator
+$message = 'Hello ' $name '!';
+```
+
+### 6. Array Access
+
+```php
+// ✅ CORRECT - Check if key exists
+$value = isset($array['key']) ? $array['key'] : null;
+$value = $array['key'] ?? null; // PHP 7.0+
+
+// ❌ WRONG - Accessing undefined key
+$value = $array['key']; // May cause undefined index notice
+```
+
+### 7. Database Query Syntax
+
+```php
+// ✅ CORRECT - Use prepared statements
+$sql = "SELECT * FROM matches WHERE id = :id";
+$stmt = $db->prepare($sql);
+$stmt->execute(['id' => $matchId]);
+
+// ❌ WRONG - SQL injection risk
+$sql = "SELECT * FROM matches WHERE id = " . $matchId;
+$result = $db->query($sql);
+```
+
+### 8. JSON Encoding/Decoding
+
+```php
+// ✅ CORRECT - Handle errors
+$data = json_decode($json, true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    error_log('JSON decode error: ' . json_last_error_msg());
+    $data = [];
+}
+
+// ❌ WRONG - No error handling
+$data = json_decode($json, true); // May return null on error
+```
+
+### 9. Error Prevention Checklist
+
+Before saving any PHP file, verify:
+- [ ] All opening brackets `{` have closing `}`
+- [ ] All opening parentheses `(` have closing `)`
+- [ ] All opening square brackets `[` have closing `]`
+- [ ] All strings have matching quotes
+- [ ] All statements end with semicolon `;`
+- [ ] All function calls have matching parentheses
+- [ ] All array keys are properly quoted
+- [ ] All variable names are valid identifiers
+- [ ] All `require_once`/`include_once` paths are correct
+- [ ] No trailing commas in function calls (PHP < 7.3)
+
+### 10. Pre-Save Validation
+
+**Always run these checks:**
+1. **PHP Lint**: `php -l filename.php`
+2. **IDE Syntax Check**: Check for red underlines
+3. **Path Validation**: Verify all `require_once` paths exist
+4. **Bracket Matching**: Use IDE bracket matching feature
+5. **Quote Matching**: Ensure all quotes are properly closed
+
+### 11. Common Patterns in This Codebase
+
+#### Config File Pattern
+```php
+<?php
+// Always start with opening tag
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/db.php';
+```
+
+#### Database Query Pattern
+```php
+$sql = "SELECT * FROM table WHERE id = :id";
+$stmt = $db->prepare($sql);
+$stmt->execute(['id' => $id]);
+$result = $stmt->fetch();
+```
+
+#### Error Handling Pattern
+```php
+if (!$result) {
+    require_once __DIR__ . '/../includes/utils.php';
+    header('Location: ' . publicUrl(''));
+    exit;
+}
+```
+
+### 12. IDE Configuration
+
+**Recommended PHP settings:**
+- PHP Version: 7.4+ (for null coalescing, typed properties)
+- Error Reporting: E_ALL in development
+- Display Errors: Off in production
+- Short Open Tags: Off (use `<?php` always)
+
+### 13. Automated Checks
+
+**Before committing:**
+- Run `php -l` on all modified PHP files
+- Use IDE's built-in syntax checker
+- Enable PHP error reporting in development
+- Check error logs after deployment

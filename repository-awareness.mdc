@@ -1,0 +1,323 @@
+---
+description: Repository Awareness - Understand codebase structure before making changes
+globs: **/*
+alwaysApply: true
+---
+
+# Repository Awareness Rules
+
+## 1. Always Understand Context First
+
+### Before Making Any Changes
+
+**MANDATORY STEPS:**
+1. **Read the file** you're about to edit completely
+2. **Understand the codebase structure** - check directory layout
+3. **Find similar patterns** - look for existing implementations
+4. **Check dependencies** - see what files/classes are used
+5. **Review related files** - understand the full context
+
+### Codebase Structure (This Project)
+
+```
+cricapp/
+├── admin/              # Admin panel (protected routes)
+│   ├── matches/       # Match management
+│   ├── players/        # Player management
+│   ├── teams/          # Team management
+│   └── series/         # Series management
+├── public/             # Public-facing pages
+│   ├── live-match.php  # Live match view
+│   ├── match-view.php  # Match details
+│   └── index.php       # Home page
+├── api/v1/             # REST API endpoints
+│   ├── matches.php     # Match API
+│   ├── events.php      # Event API
+│   └── auth.php        # Authentication API
+├── classes/            # Model classes (MVC)
+│   ├── Match.php       # Match model
+│   ├── Player.php      # Player model
+│   └── Team.php        # Team model
+├── includes/           # Core infrastructure
+│   ├── config.php      # Configuration
+│   ├── db.php          # Database connection
+│   └── utils.php       # Utility functions
+└── assets/             # Static assets
+    ├── css/            # Stylesheets
+    ├── js/             # JavaScript files
+    └── images/         # Images
+```
+
+## 2. Pattern Recognition
+
+### File Naming Conventions
+
+- **PHP Classes**: PascalCase (e.g., `Match.php`, `Player.php`)
+- **PHP Files**: lowercase with hyphens (e.g., `live-match.php`, `match-view.php`)
+- **JavaScript**: camelCase (e.g., `liveMatch.js`, `apiClient.js`)
+- **CSS**: lowercase with hyphens (e.g., `live-match.css`, `public.css`)
+
+### Code Patterns
+
+#### Database Access Pattern
+```php
+// Pattern: Always use Database::getInstance()->getConnection()
+$db = Database::getInstance()->getConnection();
+$sql = "SELECT * FROM matches WHERE id = :id";
+$stmt = $db->prepare($sql);
+$stmt->execute(['id' => $matchId]);
+$result = $stmt->fetch();
+```
+
+#### Model Usage Pattern
+```php
+// Pattern: Use model classes for data access
+$matchModel = new MatchModel();
+$matchData = $matchModel->getById($matchId);
+```
+
+#### Path Helper Pattern
+```php
+// Pattern: Use utility functions for paths
+require_once __DIR__ . '/../includes/utils.php';
+$url = publicUrl('matches.php');
+$asset = assetUrl('css/main.css');
+```
+
+## 3. Dependency Awareness
+
+### Before Editing, Check:
+
+1. **What files does this file include?**
+   - Check `require_once` statements
+   - Verify paths are correct
+   - Understand dependencies
+
+2. **What files include this file?**
+   - Search for `require_once` of this file
+   - Understand impact of changes
+
+3. **What classes/functions are used?**
+   - Check class definitions
+   - Verify function signatures
+   - Understand return types
+
+### Example: Editing `live-match.php`
+
+**Before editing, check:**
+- `includes/config.php` - Configuration constants
+- `includes/db.php` - Database connection
+- `classes/Match.php` - Match model class
+- `includes/utils.php` - Utility functions
+- `includes/public-header.php` - Header rendering
+- `assets/css/live-match.css` - Styles
+- `assets/js/live-match.js` - JavaScript
+
+## 4. Configuration Awareness
+
+### Key Configuration Files
+
+1. **`includes/config.php`**
+   - Base path detection
+   - Database defaults
+   - JWT configuration
+   - Rate limiting
+
+2. **`includes/config.local.php`** (if exists)
+   - Database credentials
+   - Environment-specific settings
+   - JWT secret
+
+3. **Path Detection**
+   - Uses `detectBasePath()` function
+   - Supports root and subdirectory deployments
+   - Uses `APP_BASE_PATH` constant
+
+### Using Configuration
+
+```php
+// ✅ CORRECT - Use constants from config
+$basePath = APP_BASE_PATH;
+$dbHost = DB_HOST;
+
+// ❌ WRONG - Hardcoded values
+$basePath = '/cricapp';
+$dbHost = 'localhost';
+```
+
+## 5. Database Schema Awareness
+
+### Key Tables
+
+- **matches**: Match information
+- **players**: Player information
+- **teams**: Team information
+- **series**: Series/tournament information
+- **events**: Match events (runs, wickets, extras)
+- **player_appearances**: Player participation in matches
+
+### Query Patterns
+
+```php
+// Pattern: Always use prepared statements
+$sql = "SELECT * FROM matches WHERE id = :id";
+$stmt = $db->prepare($sql);
+$stmt->execute(['id' => $matchId]);
+
+// Pattern: Join with player_appearances for player data
+$sql = "SELECT e.*, pa.team_id, p.name as player_name
+        FROM events e
+        LEFT JOIN player_appearances pa ON e.appearance_id = pa.appearance_id
+        LEFT JOIN players p ON pa.player_id = p.player_id
+        WHERE e.match_id = :match_id";
+```
+
+## 6. API Structure Awareness
+
+### API Endpoints Pattern
+
+- **Base URL**: `/api/v1/`
+- **Authentication**: JWT tokens
+- **Response Format**: JSON
+- **Error Handling**: Consistent error responses
+
+### API File Structure
+
+```php
+// Pattern: api/v1/matches.php
+<?php
+require_once __DIR__ . '/../../includes/config.php';
+require_once __DIR__ . '/../../includes/db.php';
+
+header('Content-Type: application/json');
+
+// Handle request
+$method = $_SERVER['REQUEST_METHOD'];
+// ... route handling
+```
+
+## 7. Asset Path Awareness
+
+### Asset URL Pattern
+
+```php
+// Pattern: Use assetUrl() helper
+require_once __DIR__ . '/../includes/utils.php';
+$cssUrl = assetUrl('css/main.css');
+$jsUrl = assetUrl('js/app.js');
+```
+
+### CSS File Organization
+
+- `main.css` - Base styles
+- `public.css` - Public page styles
+- `premium-design.css` - Premium design system
+- `live-match.css` - Live match specific styles
+- `bottom-nav-icons.css` - Navigation styles
+
+## 8. Mobile-First Awareness
+
+### Responsive Breakpoints
+
+- **Mobile**: `max-width: 768px`
+- **Tablet**: `768px - 1024px`
+- **Desktop**: `1024px+`
+
+### Mobile Patterns
+
+```css
+/* Pattern: Mobile-first responsive design */
+.container {
+    padding: 1rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0.5rem 0.75rem;
+    }
+}
+```
+
+## 9. Error Prevention Through Awareness
+
+### Before Making Changes
+
+1. **Search for similar code** - Find existing patterns
+2. **Check for related files** - Understand dependencies
+3. **Review recent changes** - See what was modified recently
+4. **Test in isolation** - Verify changes don't break existing code
+5. **Check error logs** - Look for existing issues
+
+### Common Mistakes to Avoid
+
+1. **Hardcoded paths** - Always use `APP_BASE_PATH` or `publicUrl()`
+2. **Direct database queries** - Use model classes or prepared statements
+3. **Missing error handling** - Always check for null/empty results
+4. **Ignoring mobile view** - Always test responsive design
+5. **Breaking existing patterns** - Follow established conventions
+
+## 10. Codebase-Specific Rules
+
+### This Project Uses:
+
+- **PHP 7.4+** - Use modern PHP features
+- **PDO** - Database access (prepared statements)
+- **JWT** - Authentication tokens
+- **Session-based auth** - For admin panel
+- **RESTful API** - JSON responses
+- **Mobile-first CSS** - Responsive design
+- **Vanilla JavaScript** - No frameworks (Vue.js optional)
+
+### Always Follow:
+
+- **DRY principle** - Don't repeat code
+- **Single responsibility** - One function, one purpose
+- **Error handling** - Always check for errors
+- **Security first** - Validate input, use prepared statements
+- **Mobile responsive** - Test on mobile devices
+- **Consistent naming** - Follow project conventions
+
+## 11. Quick Reference
+
+### Common Paths
+
+```php
+// Config
+require_once __DIR__ . '/../includes/config.php';
+
+// Database
+require_once __DIR__ . '/../includes/db.php';
+$db = Database::getInstance()->getConnection();
+
+// Utils
+require_once __DIR__ . '/../includes/utils.php';
+$url = publicUrl('matches.php');
+$asset = assetUrl('css/main.css');
+
+// Models
+require_once __DIR__ . '/../classes/Match.php';
+$matchModel = new MatchModel();
+```
+
+### Common Functions
+
+- `publicUrl($path)` - Generate public URL
+- `assetUrl($path)` - Generate asset URL
+- `htmlspecialchars($string)` - Escape HTML
+- `json_encode($data)` - Encode JSON
+- `json_decode($json, true)` - Decode JSON
+
+## 12. Validation Checklist
+
+Before committing changes:
+
+- [ ] Read the entire file you're editing
+- [ ] Check for similar patterns in other files
+- [ ] Verify all `require_once` paths are correct
+- [ ] Test on mobile view (max-width: 768px)
+- [ ] Check for syntax errors (`php -l`)
+- [ ] Verify database queries use prepared statements
+- [ ] Ensure error handling is in place
+- [ ] Test the functionality manually
+- [ ] Check for hardcoded paths
+- [ ] Verify responsive design works

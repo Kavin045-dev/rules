@@ -1,0 +1,290 @@
+---
+description: Universal Prompt Expansion Rule - Automatically expand short, vague, or incomplete instructions into clear, structured, professional-grade tasks
+alwaysApply: true
+---
+
+# Universal Prompt Expansion Rule
+
+Whenever a short, vague, or incomplete instruction is received (like "fix UI", "improve backend", "make it responsive", "add login feature", "optimize", "update design", etc.), automatically expand it into a clear, structured, professional-grade task.
+
+## 1. Identify Context
+
+- Understand what area the command applies to: UI, backend, database, API, logic, deployment, testing, or documentation.
+- If unclear, infer it from project files or previous context.
+- Analyze existing codebase structure, patterns, and conventions before expanding.
+
+## 2. Expand the Instruction
+
+Turn the short command into a full, detailed brief covering:
+
+### Goal
+What is the final outcome or user value.
+
+### Scope
+Which part of the system or code it affects.
+
+### Action
+Step-by-step technical tasks to achieve it.
+
+### Design/Dev Rules
+Mention best practices:
+- **UI**: 8px grid system, consistent spacing, accessible contrast ratios (≥4.5:1), responsive breakpoints (360px–1024px+)
+- **API**: REST standards, proper HTTP status codes, consistent error response format, versioning
+- **Database**: Proper indexing, normalized schemas, query optimization
+- **Backend**: Modular functions, input validation, error handling, logging
+- **Security**: Parameterized queries, input sanitization, authentication checks, authorization levels
+
+### Testing
+Define acceptance criteria or validation steps:
+- Unit tests for core logic
+- Integration tests for workflows
+- Manual testing scenarios
+- Performance benchmarks where applicable
+
+### Dependencies
+Identify related files, components, or modules that might be impacted.
+
+## 3. Add Measurable Details
+
+Always add specifics:
+
+- **UI**: spacing values, colors (hex/rgb), dimensions, states (hover, active, disabled), responsive breakpoints, animation durations
+- **Backend**: function signatures, endpoint paths, schema changes, performance metrics (response time, throughput), cache strategies
+- **Database**: table names, column types, index columns, query execution time targets
+- **Copy/Content**: tone (professional/casual), word count limits, readability scores
+- **Architecture**: flow diagrams (when complex), dependencies, data structures, integration points
+- **DevOps**: environment names, deploy commands, rollback procedures, monitoring thresholds
+
+## 4. Enforce Quality
+
+Every expanded prompt must include:
+
+- **Code Best Practices**: DRY principles, single responsibility, meaningful naming, proper error handling
+- **Security Considerations**: Input validation, SQL injection prevention, XSS protection, authentication/authorization checks
+- **Performance or Optimization**: Query optimization, caching strategies, asset compression, lazy loading where applicable
+- **Testing Plan**: Unit tests, integration tests, manual test scenarios, edge cases
+- **Acceptance Criteria**: Clear, measurable outcomes in plain language (e.g., "User can log in within 2 seconds", "Form validates email format before submission")
+
+## 5. Example Transformations
+
+### "Fix UI" →
+**Title:** Refine UI Components with Consistent Spacing and Accessibility
+
+**Goal:** Improve visual consistency, accessibility, and responsive behavior across the UI
+
+**Scope:** Header, buttons, forms, and layout components
+
+**Tasks:**
+1. Audit current spacing (measure gaps, padding, margins)
+2. Apply 8px grid system consistently across all components
+3. Adjust button alignment to baseline grid
+4. Verify color contrast ratios meet WCAG AA standards (≥4.5:1)
+5. Test responsive layout at breakpoints: 360px, 768px, 1024px, 1440px
+6. Update CSS variables for spacing tokens
+7. Document spacing system in design tokens file
+
+**Expected Outcome:** 
+- Consistent 8px-based spacing throughout
+- All interactive elements have accessible contrast
+- Responsive design works seamlessly across target devices
+- Zero accessibility violations in automated tests
+
+**Validation:**
+- Run accessibility audit (axe-core or Lighthouse)
+- Visual regression tests at all breakpoints
+- Manual review of spacing consistency
+- Cross-browser testing (Chrome, Firefox, Safari)
+
+### "Improve backend" →
+**Title:** Refactor Backend API for Modularity and Performance
+
+**Goal:** Improve code maintainability, reduce redundancy, and enhance API response times
+
+**Scope:** API controllers, database queries, middleware layer
+
+**Tasks:**
+1. Refactor controllers into modular functions (single responsibility principle)
+2. Extract common validation logic into middleware
+3. Implement database query caching for frequent queries (TTL: 5 minutes)
+4. Add request/response logging middleware
+5. Create service layer abstraction for business logic
+6. Optimize N+1 query patterns using eager loading or batch queries
+7. Add API rate limiting middleware
+8. Write unit tests for refactored functions (target: 80% coverage)
+9. Create integration tests for API endpoints
+
+**Expected Outcome:**
+- Controllers follow single responsibility pattern
+- Common validation handled by middleware
+- Cached queries reduce DB load by ~40%
+- API response times <200ms for 95th percentile
+- Test coverage ≥80% for new code
+
+**Validation:**
+- Run existing test suite (must pass)
+- Load test API endpoints (100 concurrent users)
+- Profile queries and verify cache hits
+- Code review for modularity and DRY compliance
+
+### "Add login feature" →
+**Title:** Implement Secure User Authentication System
+
+**Goal:** Enable users to authenticate securely and access protected resources
+
+**Scope:** Authentication endpoints, session management, client-side forms, redirect logic
+
+**Tasks:**
+1. Design user authentication schema (users table: id, email, password_hash, created_at)
+2. Create PHP login endpoint (`POST /api/v1/auth/login`) with email/password validation
+3. Implement password hashing using `password_hash()` with PASSWORD_BCRYPT
+4. Create session management class using PHP sessions
+5. Generate JWT token for API access (store in session)
+6. Build client-side login form with:
+   - Email input (type="email", required)
+   - Password input (type="password", required, minlength=8)
+   - Client-side validation before submission
+   - Error message display area
+7. Implement error handling for invalid credentials (HTTP 401)
+8. Add redirect logic: successful login → `/admin/dashboard`, failed → `/admin/login?error=1`
+9. Create logout endpoint that destroys session
+10. Write tests for:
+    - Valid login credentials
+    - Invalid email format
+    - Invalid password
+    - Session persistence
+    - Logout functionality
+
+**Expected Outcome:**
+- Users can log in with email/password
+- Sessions persist across requests
+- Invalid credentials show clear error messages
+- Successful login redirects to dashboard
+- Logout destroys session and redirects to login
+
+**Validation:**
+- Manual test: valid credentials → dashboard
+- Manual test: invalid credentials → error message
+- Test with 3 user roles: admin, moderator, user
+- Verify session timeout after 30 minutes inactivity
+- Test logout clears session
+- Security scan for SQL injection, XSS vulnerabilities
+
+### "Optimize DB" →
+**Title:** Database Schema Optimization and Query Performance
+
+**Goal:** Improve query performance and reduce database load
+
+**Scope:** users, matches, players tables; frequently executed queries
+
+**Tasks:**
+1. Analyze slow query log to identify bottlenecks
+2. Add indexes:
+   - `users.email` (UNIQUE index)
+   - `users.created_at` (for date range queries)
+   - `matches.series_id` (foreign key lookup)
+   - `matches.status` (for filtering active matches)
+   - `players.team_id` (foreign key lookup)
+3. Normalize redundant columns (extract repeated data to lookup tables if applicable)
+4. Optimize JOIN queries using proper index hints where needed
+5. Add query result caching for read-heavy operations
+6. Document index strategy and query patterns
+7. Create migration script with rollback capability
+
+**Expected Outcome:**
+- Query response time <50ms for indexed lookups
+- Reduced redundant data storage
+- Index strategy documented
+- Migration script tested with rollback
+
+**Validation:**
+- Load test with 10k records in each table
+- Measure query execution time before/after
+- Verify indexes are being used (EXPLAIN queries)
+- Test migration rollback procedure
+- Monitor database load during peak usage
+
+### "Fix speed issue" →
+**Title:** Performance Optimization and Page Load Speed Improvement
+
+**Goal:** Reduce page load time and improve user experience
+
+**Scope:** Page rendering, asset loading, database queries, caching
+
+**Tasks:**
+1. Profile page load using browser DevTools Performance tab
+2. Identify bottlenecks:
+   - Large unoptimized images (target: <200KB per image)
+   - Slow database queries (target: <100ms)
+   - Render-blocking CSS/JS
+   - Missing cache headers
+3. Compress images (convert to WebP, use `<picture>` with fallback)
+4. Enable browser caching headers (Cache-Control: max-age=3600 for static assets)
+5. Implement lazy loading for images below fold
+6. Minify CSS and JavaScript files
+7. Optimize database queries (add indexes if missing)
+8. Consider CDN for static assets if applicable
+9. Add performance monitoring (Lighthouse CI)
+
+**Expected Outcome:**
+- Page load time <2 seconds on 3G connection
+- Lighthouse Performance score ≥90
+- First Contentful Paint <1.5 seconds
+- Time to Interactive <3 seconds
+
+**Validation:**
+- Run Lighthouse audit (target: ≥90 performance score)
+- Test on slow 3G throttling
+- Measure Core Web Vitals (LCP, FID, CLS)
+- Compare before/after metrics
+- Test across different browsers
+
+## 6. Output Format
+
+Always produce expanded responses in this format:
+
+**Title:** <Short task summary>
+
+**Goal:** <Why this is needed>
+
+**Scope:** <Which parts of the system/code are affected>
+
+**Tasks:** 
+<Step-by-step technical plan with numbered list>
+
+**Expected Outcome:** 
+<What "done" looks like - specific, measurable results>
+
+**Validation:** 
+<How to test it - testing methods, tools, acceptance criteria>
+
+## 7. Behavioral Rules
+
+- **Never reply with vague text or questions** like "what exactly do you mean" - always assume intent and expand intelligently.
+- **Always include measurable or testable end results** - use specific metrics, timeframes, and acceptance criteria.
+- **Never skip technical reasoning** - explain what needs to be done, how it should be implemented, and why this approach is chosen.
+- **Infer context from codebase** - scan relevant files before expanding to understand existing patterns and conventions.
+- **Match existing code style** - follow the project's naming conventions, architecture patterns, and coding standards.
+- **Consider dependencies** - identify related components, files, or systems that might be impacted by changes.
+- **Include security and performance** - always address these concerns even if not explicitly mentioned.
+- **Provide actionable steps** - break down complex tasks into concrete, executable actions.
+- **Set realistic expectations** - base estimates on codebase complexity and existing patterns.
+- **Document assumptions** - if you make reasonable assumptions about intent, state them clearly.
+
+## 8. Special Cases
+
+### Ambiguous Context
+If the area is unclear, check:
+- Recent file edits in the conversation
+- Currently open files
+- Project structure (admin/, public/, api/, classes/)
+- Related patterns in similar files
+
+### Multiple Possible Interpretations
+If a prompt could mean multiple things, expand to cover the most likely scenario based on:
+- Project context (cricket app → likely match/player/team related)
+- Recent work patterns
+- File structure hints
+- Industry best practices for that domain
+
+### Overlapping Concerns
+When a prompt touches multiple areas (e.g., "improve user flow" → UI + backend + database), expand to cover all affected areas with clear separation of concerns.

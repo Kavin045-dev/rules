@@ -1,0 +1,565 @@
+---
+description: UI/UX Best Practices for Cricket App - Specific design patterns and user experience guidelines
+globs: **/*.php, **/*.css, **/*.html
+---
+
+# UI/UX Best Practices for Cricket App
+
+## 1. Design System
+
+### Color Palette (This Project)
+
+```css
+/* Primary Colors */
+--primary-green: #01B489;
+--primary-dark: #1f2937;
+--primary-light: #f9fafb;
+
+/* Status Colors */
+--success: #10b981;
+--error: #dc2626;
+--warning: #f59e0b;
+--info: #2563eb;
+
+/* Text Colors */
+--text-primary: #1f2937;
+--text-secondary: #6b7280;
+--text-muted: #9ca3af;
+
+/* Background Colors */
+--bg-white: #ffffff;
+--bg-gray-50: #f9fafb;
+--bg-gray-100: #f3f4f6;
+--bg-gray-200: #e5e7eb;
+```
+
+### Typography Scale
+
+```css
+/* Mobile */
+--font-xs: 0.75rem;    /* 12px */
+--font-sm: 0.875rem;  /* 14px */
+--font-base: 1rem;     /* 16px */
+--font-lg: 1.125rem;   /* 18px */
+--font-xl: 1.25rem;    /* 20px */
+--font-2xl: 1.5rem;    /* 24px */
+
+/* Desktop */
+@media (min-width: 768px) {
+    --font-xs: 0.8125rem;  /* 13px */
+    --font-sm: 0.9375rem;  /* 15px */
+    --font-base: 1rem;     /* 16px */
+    --font-lg: 1.25rem;    /* 20px */
+    --font-xl: 1.5rem;     /* 24px */
+    --font-2xl: 2rem;      /* 32px */
+}
+```
+
+## 2. Cricket-Specific UI Patterns
+
+### Score Display Pattern
+
+```html
+<!-- ✅ CORRECT - Clear score display -->
+<div class="score-display">
+    <div class="team-name">IND</div>
+    <div class="score">245-3</div>
+    <div class="overs">(42.3)</div>
+</div>
+
+<!-- Style -->
+.score-display {
+    text-align: center;
+    padding: 1rem;
+}
+
+.team-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.score {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.overs {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+```
+
+### Live Match Header Pattern
+
+```html
+<!-- ✅ CORRECT - Compact live match header -->
+<div class="live-match-header">
+    <div class="match-title">IND v AUS</div>
+    <div class="match-status">LIVE</div>
+    <div class="current-score">IND 245-3 (42.3)</div>
+</div>
+```
+
+### Scorecard Table Pattern
+
+```html
+<!-- ✅ CORRECT - Clear scorecard table -->
+<table class="scorecard-table">
+    <thead>
+        <tr>
+            <th>Batter</th>
+            <th>R</th>
+            <th>B</th>
+            <th>4s</th>
+            <th>6s</th>
+            <th>SR</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Virat Kohli *</td>
+            <td>85</td>
+            <td>72</td>
+            <td>8</td>
+            <td>2</td>
+            <td>118.06</td>
+        </tr>
+    </tbody>
+</table>
+```
+
+## 3. User Experience Patterns
+
+### Loading States
+
+```html
+<!-- ✅ CORRECT - Show loading state -->
+<div class="loading-state" id="loading">
+    <div class="spinner"></div>
+    <p>Loading match data...</p>
+</div>
+
+<!-- Hide when loaded -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load data
+    loadMatchData().then(() => {
+        document.getElementById('loading').style.display = 'none';
+    });
+});
+</script>
+```
+
+### Error States
+
+```html
+<!-- ✅ CORRECT - Clear error message -->
+<div class="error-state" id="error" style="display: none;">
+    <div class="error-icon">⚠️</div>
+    <p class="error-message">Failed to load match data</p>
+    <button class="retry-btn" onclick="retryLoad()">Retry</button>
+</div>
+```
+
+### Empty States
+
+```html
+<!-- ✅ CORRECT - Helpful empty state -->
+<div class="empty-state">
+    <div class="empty-icon">📊</div>
+    <p class="empty-message">No matches found</p>
+    <p class="empty-subtitle">Check back later for upcoming matches</p>
+</div>
+```
+
+## 4. Navigation Patterns
+
+### Bottom Navigation (Mobile)
+
+```html
+<!-- ✅ CORRECT - Fixed bottom navigation -->
+<nav class="bottom-nav">
+    <a href="/" class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+    </a>
+    <a href="/matches" class="nav-item">
+        <span class="nav-icon">📅</span>
+        <span class="nav-label">Matches</span>
+    </a>
+    <a href="/live" class="nav-item">
+        <span class="nav-icon">▶️</span>
+        <span class="nav-label">Live</span>
+    </a>
+</nav>
+```
+
+### Tab Navigation
+
+```html
+<!-- ✅ CORRECT - Clear tab navigation -->
+<nav class="tab-nav">
+    <a href="?tab=info" class="tab">INFO</a>
+    <a href="?tab=live" class="tab active">LIVE</a>
+    <a href="?tab=scorecard" class="tab">SCORECARD</a>
+    <a href="?tab=squads" class="tab">SQUADS</a>
+</nav>
+```
+
+## 5. Data Display Patterns
+
+### Statistics Display
+
+```html
+<!-- ✅ CORRECT - Clear stats display -->
+<div class="stats-grid">
+    <div class="stat-item">
+        <div class="stat-label">CRR</div>
+        <div class="stat-value">6.25</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-label">REQ</div>
+        <div class="stat-value">8.50</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-label">TAR</div>
+        <div class="stat-value">245</div>
+    </div>
+</div>
+```
+
+### Commentary Display
+
+```html
+<!-- ✅ CORRECT - Clear commentary format -->
+<div class="commentary-item">
+    <div class="commentary-ball">42.3</div>
+    <div class="commentary-text">
+        <span class="commentary-circle">4</span>
+        Bumrah to Kohli, <strong>FOUR</strong>
+    </div>
+</div>
+```
+
+## 6. Interaction Patterns
+
+### Button States
+
+```css
+/* ✅ CORRECT - Clear button states */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #01B489;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #019970;
+}
+
+.btn-primary:active {
+    background: #017a5a;
+    transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+```
+
+### Link States
+
+```css
+/* ✅ CORRECT - Clear link states */
+a {
+    color: #2563eb;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+a:active {
+    color: #1e40af;
+}
+```
+
+## 7. Accessibility Requirements
+
+### Color Contrast
+
+```css
+/* ✅ CORRECT - WCAG AA compliant contrast */
+.text-primary {
+    color: #1f2937; /* 4.5:1 contrast on white */
+}
+
+.text-secondary {
+    color: #6b7280; /* 4.5:1 contrast on white */
+}
+
+/* ❌ WRONG - Low contrast */
+.text-muted {
+    color: #d1d5db; /* 1.5:1 contrast - fails WCAG */
+}
+```
+
+### Focus States
+
+```css
+/* ✅ CORRECT - Visible focus indicators */
+button:focus,
+a:focus,
+input:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+}
+
+/* Remove default outline only if custom is provided */
+button:focus:not(:focus-visible) {
+    outline: none;
+}
+```
+
+### Semantic HTML
+
+```html
+<!-- ✅ CORRECT - Semantic HTML -->
+<header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <article>
+        <h1>Match Title</h1>
+        <section>
+            <h2>Scorecard</h2>
+            <!-- Content -->
+        </section>
+    </article>
+</main>
+
+<footer>
+    <p>© 2024 Cricket App</p>
+</footer>
+```
+
+## 8. Performance Patterns
+
+### Lazy Loading
+
+```html
+<!-- ✅ CORRECT - Lazy load images -->
+<img src="placeholder.jpg" 
+     data-src="actual-image.jpg" 
+     loading="lazy" 
+     alt="Description">
+
+<script>
+// Load images when in viewport
+const images = document.querySelectorAll('img[data-src]');
+const imageObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            imageObserver.unobserve(img);
+        }
+    });
+});
+images.forEach(img => imageObserver.observe(img));
+</script>
+```
+
+### Debouncing
+
+```javascript
+// ✅ CORRECT - Debounce search input
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input', debounce((e) => {
+    performSearch(e.target.value);
+}, 300));
+```
+
+## 9. Mobile-Specific UX
+
+### Touch-Friendly Targets
+
+```css
+/* ✅ CORRECT - Minimum 44px touch target */
+.btn, button, a {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+}
+
+/* Prevent text selection on buttons */
+.btn {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+```
+
+### Swipe Gestures
+
+```javascript
+// ✅ CORRECT - Swipe navigation
+let touchStartX = 0;
+let touchEndX = 0;
+
+element.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+element.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    if (touchEndX < touchStartX - 50) {
+        // Swipe left - next tab
+        nextTab();
+    }
+    if (touchEndX > touchStartX + 50) {
+        // Swipe right - previous tab
+        prevTab();
+    }
+}
+```
+
+## 10. Cricket-Specific Features
+
+### Live Score Updates
+
+```javascript
+// ✅ CORRECT - Auto-refresh live scores
+function startLiveUpdates() {
+    const interval = setInterval(async () => {
+        try {
+            const response = await fetch('/api/v1/matches/live');
+            const data = await response.json();
+            updateScoreDisplay(data);
+        } catch (error) {
+            console.error('Update failed:', error);
+            clearInterval(interval);
+        }
+    }, 5000); // Update every 5 seconds
+    
+    // Stop on page unload
+    window.addEventListener('beforeunload', () => {
+        clearInterval(interval);
+    });
+}
+```
+
+### Over-by-Over Display
+
+```html
+<!-- ✅ CORRECT - Clear over display -->
+<div class="over-display">
+    <div class="over-number">OVER 42</div>
+    <div class="over-runs">1 4 0 2 1 1 (9 RUNS)</div>
+    <div class="over-stats">
+        <span>Kohli 85(72)</span>
+        <span>Bumrah 2-0-15-1</span>
+    </div>
+</div>
+```
+
+## 11. Validation Checklist
+
+### UI/UX Requirements
+
+- [ ] **Color contrast**: All text meets WCAG AA (4.5:1)
+- [ ] **Touch targets**: Minimum 44px × 44px on mobile
+- [ ] **Focus states**: All interactive elements have visible focus
+- [ ] **Loading states**: Show loading indicators for async operations
+- [ ] **Error states**: Clear error messages with retry options
+- [ ] **Empty states**: Helpful messages when no data
+- [ ] **Responsive**: Works on 320px to 1920px screens
+- [ ] **Performance**: Page load < 3 seconds on 3G
+- [ ] **Accessibility**: Keyboard navigation works
+- [ ] **Semantic HTML**: Proper use of HTML5 semantic elements
+
+## 12. Common UI Patterns
+
+### Card Pattern
+
+```html
+<!-- ✅ CORRECT - Card component -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Match Title</h3>
+        <span class="card-badge">LIVE</span>
+    </div>
+    <div class="card-body">
+        <!-- Content -->
+    </div>
+    <div class="card-footer">
+        <a href="/match/123" class="card-link">View Details</a>
+    </div>
+</div>
+```
+
+### Badge Pattern
+
+```html
+<!-- ✅ CORRECT - Status badges -->
+<span class="badge badge-live">LIVE</span>
+<span class="badge badge-completed">COMPLETED</span>
+<span class="badge badge-upcoming">UPCOMING</span>
+```
+
+### Modal Pattern
+
+```html
+<!-- ✅ CORRECT - Modal dialog -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Modal Title</h2>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <!-- Content -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary">Confirm</button>
+            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+```

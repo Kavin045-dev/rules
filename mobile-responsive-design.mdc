@@ -1,0 +1,573 @@
+---
+description: Mobile-First Responsive Design - Ensure all layouts work on mobile devices
+globs: **/*.php, **/*.css, **/*.html
+---
+
+# Mobile-First Responsive Design Rules
+
+## 1. Mobile-First Approach
+
+### Always Design for Mobile First
+
+- **Start with mobile layout** (320px - 768px)
+- **Progressive enhancement** for larger screens
+- **Test on actual devices** when possible
+- **Use viewport meta tag** in all HTML files
+
+```html
+<!-- ✅ REQUIRED in all HTML files -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+
+## 2. Breakpoint Strategy
+
+### Standard Breakpoints (This Project)
+
+```css
+/* Mobile: 320px - 768px (default, no media query) */
+.container {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Tablet: 768px and up */
+@media (min-width: 768px) {
+    .container {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* Desktop: 1024px and up */
+@media (min-width: 1024px) {
+    .container {
+        padding: 1.5rem 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+```
+
+### Mobile-First Media Queries
+
+```css
+/* ✅ CORRECT - Mobile first (min-width) */
+@media (min-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+}
+
+/* ❌ WRONG - Desktop first (max-width) */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.5rem;
+    }
+}
+```
+
+## 3. Typography Scaling
+
+### Mobile Typography
+
+```css
+/* Base (Mobile) */
+body {
+    font-size: 14px; /* 0.875rem */
+    line-height: 1.5;
+}
+
+h1 {
+    font-size: 1.5rem; /* 24px */
+    line-height: 1.2;
+}
+
+h2 {
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.3;
+}
+
+/* Tablet and up */
+@media (min-width: 768px) {
+    body {
+        font-size: 16px; /* 1rem */
+    }
+    
+    h1 {
+        font-size: 2rem; /* 32px */
+    }
+    
+    h2 {
+        font-size: 1.5rem; /* 24px */
+    }
+}
+```
+
+### Font Size Guidelines
+
+- **Mobile**: 14px (0.875rem) base, minimum 12px (0.75rem)
+- **Tablet**: 16px (1rem) base
+- **Desktop**: 16px (1rem) base, can go larger
+
+## 4. Spacing System
+
+### Mobile Spacing (8px Grid)
+
+```css
+/* Mobile: Smaller spacing */
+.container {
+    padding: 0.5rem; /* 8px */
+    margin-bottom: 0.75rem; /* 12px */
+}
+
+.section {
+    padding: 0.75rem; /* 12px */
+    margin-bottom: 1rem; /* 16px */
+}
+
+/* Tablet and up: Larger spacing */
+@media (min-width: 768px) {
+    .container {
+        padding: 1rem; /* 16px */
+        margin-bottom: 1.5rem; /* 24px */
+    }
+    
+    .section {
+        padding: 1.5rem; /* 24px */
+        margin-bottom: 2rem; /* 32px */
+    }
+}
+```
+
+## 5. Layout Patterns
+
+### Container Pattern
+
+```css
+/* Mobile: Full width, small padding */
+.container {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    max-width: 100%;
+}
+
+/* Tablet: Centered, larger padding */
+@media (min-width: 768px) {
+    .container {
+        padding: 1rem 1.5rem;
+    }
+}
+
+/* Desktop: Max width, centered */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem 2rem;
+    }
+}
+```
+
+### Flexbox Patterns
+
+```css
+/* Mobile: Stack vertically */
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Tablet: Horizontal layout */
+@media (min-width: 768px) {
+    .flex-container {
+        flex-direction: row;
+        gap: 1rem;
+    }
+}
+```
+
+### Grid Patterns
+
+```css
+/* Mobile: Single column */
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) {
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1024px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+}
+```
+
+## 6. Navigation Patterns
+
+### Mobile Navigation
+
+```css
+/* Mobile: Bottom navigation (sticky) */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 0.5rem 0;
+    z-index: 100;
+}
+
+/* Mobile: Hamburger menu */
+.mobile-menu-toggle {
+    display: block;
+    padding: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .mobile-menu-toggle {
+        display: none;
+    }
+}
+```
+
+### Header Pattern
+
+```css
+/* Mobile: Compact header */
+.header {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+/* Tablet and up: Larger header */
+@media (min-width: 768px) {
+    .header {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+```
+
+## 7. Table Responsiveness
+
+### Mobile Table Pattern (This Project)
+
+```css
+/* Mobile: Scrollable table with sticky first column */
+.scorecard-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.75rem;
+}
+
+.scorecard-table thead,
+.scorecard-table tbody {
+    display: table;
+    width: 100%;
+    table-layout: auto;
+}
+
+/* Sticky first column */
+.scorecard-table th:first-child,
+.scorecard-table td:first-child {
+    position: sticky;
+    left: 0;
+    background: inherit;
+    z-index: 1;
+    min-width: 100px;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Tablet and up: Normal table */
+@media (min-width: 768px) {
+    .scorecard-table {
+        display: table;
+        font-size: 0.875rem;
+    }
+    
+    .scorecard-table th:first-child,
+    .scorecard-table td:first-child {
+        position: static;
+    }
+}
+```
+
+## 8. Form Elements
+
+### Mobile Form Pattern
+
+```css
+/* Mobile: Full width inputs */
+input, select, textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem; /* Prevents zoom on iOS */
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+}
+
+/* Mobile: Larger touch targets */
+button, .btn {
+    min-height: 44px; /* iOS touch target */
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+/* Tablet and up: Can be smaller */
+@media (min-width: 768px) {
+    input, select, textarea {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    button, .btn {
+        min-height: 36px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+}
+```
+
+## 9. Images and Media
+
+### Responsive Images
+
+```html
+<!-- ✅ CORRECT - Responsive image -->
+<img src="image.jpg" 
+     srcset="image-small.jpg 320w, image-medium.jpg 768w, image-large.jpg 1024w"
+     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+     alt="Description">
+
+<!-- ✅ CORRECT - Picture element -->
+<picture>
+    <source media="(max-width: 768px)" srcset="mobile.jpg">
+    <source media="(min-width: 769px)" srcset="desktop.jpg">
+    <img src="desktop.jpg" alt="Description">
+</picture>
+```
+
+### Image CSS
+
+```css
+/* Mobile: Full width images */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Prevent horizontal scroll */
+body {
+    overflow-x: hidden;
+}
+```
+
+## 10. Touch Targets
+
+### Minimum Touch Target Sizes
+
+- **Mobile**: Minimum 44px × 44px (iOS guideline)
+- **Tablet**: Minimum 40px × 40px
+- **Desktop**: Minimum 32px × 32px
+
+```css
+/* Mobile: Larger touch targets */
+.btn, button, a {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+}
+
+/* Tablet: Medium touch targets */
+@media (min-width: 768px) {
+    .btn, button, a {
+        min-height: 40px;
+        min-width: 40px;
+        padding: 0.5rem 1rem;
+    }
+}
+```
+
+## 11. Performance on Mobile
+
+### Optimize for Mobile
+
+```css
+/* Use will-change sparingly */
+.animated-element {
+    will-change: transform;
+}
+
+/* Reduce animations on mobile */
+@media (max-width: 768px) {
+    * {
+        animation-duration: 0.2s !important;
+        transition-duration: 0.2s !important;
+    }
+}
+```
+
+### Reduce Layout Shifts
+
+```css
+/* Reserve space for images */
+.image-container {
+    aspect-ratio: 16 / 9;
+    background: #f3f4f6;
+}
+
+/* Reserve space for ads */
+.ad-container {
+    min-height: 250px;
+    background: #f9fafb;
+}
+```
+
+## 12. Testing Checklist
+
+### Mobile Testing Requirements
+
+- [ ] Test on actual mobile device (iOS and Android)
+- [ ] Test in browser DevTools mobile emulation
+- [ ] Test at breakpoints: 320px, 375px, 414px, 768px, 1024px
+- [ ] Test landscape orientation
+- [ ] Test touch interactions
+- [ ] Test scrolling performance
+- [ ] Test form inputs (prevent zoom on iOS)
+- [ ] Test navigation (bottom nav, hamburger menu)
+- [ ] Test tables (horizontal scroll, sticky column)
+- [ ] Test images (responsive, lazy loading)
+- [ ] Test typography (readable on small screens)
+
+## 13. Common Mobile Issues
+
+### Prevent Zoom on Input Focus (iOS)
+
+```css
+/* ✅ CORRECT - Use 16px font size */
+input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+}
+
+/* ❌ WRONG - Small font causes zoom */
+input {
+    font-size: 14px; /* Causes zoom on iOS */
+}
+```
+
+### Prevent Horizontal Scroll
+
+```css
+/* ✅ CORRECT */
+body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+```
+
+### Handle Viewport Units
+
+```css
+/* ✅ CORRECT - Use safe area insets */
+.container {
+    padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
+
+/* Mobile Safari safe area */
+@supports (padding: max(0px)) {
+    .container {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+    }
+}
+```
+
+## 14. Project-Specific Mobile Patterns
+
+### Live Match Page Pattern
+
+```css
+/* Mobile: Compact scorecard */
+.scorecard-container {
+    padding: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.scorecard-table {
+    font-size: 0.75rem;
+}
+
+/* Tablet and up: Larger scorecard */
+@media (min-width: 768px) {
+    .scorecard-container {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .scorecard-table {
+        font-size: 0.875rem;
+    }
+}
+```
+
+### Navigation Tabs Pattern
+
+```css
+/* Mobile: Scrollable tabs */
+.live-nav-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0.75rem;
+}
+
+.live-nav-tabs .tab {
+    white-space: nowrap;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Tablet and up: Fixed tabs */
+@media (min-width: 768px) {
+    .live-nav-tabs {
+        overflow-x: visible;
+        padding: 0.5rem 1rem;
+    }
+}
+```
+
+## 15. Validation Rules
+
+### Before Committing Mobile Changes
+
+- [ ] All breakpoints tested (320px, 768px, 1024px)
+- [ ] No horizontal scroll on mobile
+- [ ] Touch targets are at least 44px × 44px
+- [ ] Font sizes are readable (minimum 12px)
+- [ ] Forms don't cause zoom on iOS (16px font)
+- [ ] Images are responsive
+- [ ] Tables are scrollable on mobile
+- [ ] Navigation works on mobile
+- [ ] Performance is acceptable (< 3s load time)

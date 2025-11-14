@@ -1,0 +1,496 @@
+---
+description: Error Prevention - Prevent common errors through validation and checks
+globs: **/*
+alwaysApply: true
+---
+
+# Error Prevention Rules
+
+## 1. Pre-Edit Validation
+
+### Before Editing Any File
+
+**MANDATORY CHECKS:**
+1. **Read the entire file** - Understand full context
+2. **Check syntax** - Run `php -l filename.php` for PHP files
+3. **Verify paths** - Check all `require_once` paths exist
+4. **Understand dependencies** - See what files/classes are used
+5. **Test current state** - Ensure file works before editing
+
+### Syntax Validation
+
+```bash
+# PHP syntax check
+php -l filename.php
+
+# JavaScript syntax check (if using Node.js)
+node -c filename.js
+
+# CSS validation (optional)
+# Use online CSS validator or IDE
+```
+
+## 2. PHP Error Prevention
+
+### Null/Undefined Checks
+
+```php
+// ✅ CORRECT - Always check for null/undefined
+$matchId = $_GET['id'] ?? 0;
+if (!$matchId) {
+    header('Location: /');
+    exit;
+}
+
+// ❌ WRONG - No validation
+$matchId = $_GET['id']; // May be undefined
+```
+
+### Array Access Safety
+
+```php
+// ✅ CORRECT - Use null coalescing or isset
+$value = $array['key'] ?? null;
+$value = isset($array['key']) ? $array['key'] : null;
+
+// ❌ WRONG - Direct access
+$value = $array['key']; // Undefined index notice
+```
+
+### Database Query Safety
+
+```php
+// ✅ CORRECT - Check for errors
+$stmt = $db->prepare($sql);
+if (!$stmt) {
+    error_log('Prepare failed: ' . print_r($db->errorInfo(), true));
+    return null;
+}
+$stmt->execute(['id' => $id]);
+$result = $stmt->fetch();
+
+if (!$result) {
+    return null; // Or handle error appropriately
+}
+
+// ❌ WRONG - No error checking
+$stmt = $db->prepare($sql);
+$stmt->execute(['id' => $id]);
+$result = $stmt->fetch(); // May be false
+$name = $result['name']; // Undefined index if false
+```
+
+### JSON Handling Safety
+
+```php
+// ✅ CORRECT - Check for JSON errors
+$data = json_decode($json, true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    error_log('JSON decode error: ' . json_last_error_msg());
+    $data = [];
+}
+
+// ❌ WRONG - No error checking
+$data = json_decode($json, true); // May return null
+$value = $data['key']; // Fatal error if null
+```
+
+## 3. Path Validation
+
+### File Paths
+
+```php
+// ✅ CORRECT - Use __DIR__ for relative paths
+require_once __DIR__ . '/../includes/config.php';
+
+// Verify file exists before including
+if (file_exists(__DIR__ . '/../includes/config.php')) {
+    require_once __DIR__ . '/../includes/config.php';
+} else {
+    error_log('Config file not found');
+    die('Configuration error');
+}
+
+// ❌ WRONG - Hardcoded or unchecked paths
+require_once '/var/www/config.php'; // May not exist
+require_once '../config.php'; // Relative path issues
+```
+
+### URL Paths
+
+```php
+// ✅ CORRECT - Use helper functions
+require_once __DIR__ . '/../includes/utils.php';
+$url = publicUrl('matches.php');
+$asset = assetUrl('css/main.css');
+
+// ❌ WRONG - Hardcoded paths
+$url = '/cricapp/public/matches.php'; // Breaks on different deployments
+```
+
+## 4. Input Validation
+
+### GET/POST Parameters
+
+```php
+// ✅ CORRECT - Validate and sanitize
+$matchId = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+if ($matchId <= 0) {
+    header('Location: /');
+    exit;
+}
+
+// ❌ WRONG - No validation
+$matchId = $_GET['id']; // May be undefined, may be string
+```
+
+### Form Input Validation
+
+```php
+// ✅ CORRECT - Validate all inputs
+$email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+if (!$email) {
+    $errors[] = 'Invalid email address';
+}
+
+$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+if (empty($name)) {
+    $errors[] = 'Name is required';
+}
+
+// ❌ WRONG - No validation
+$email = $_POST['email']; // May be invalid
+$name = $_POST['name']; // May contain XSS
+```
+
+## 5. Database Error Prevention
+
+### Prepared Statements
+
+```php
+// ✅ CORRECT - Always use prepared statements
+$sql = "SELECT * FROM matches WHERE id = :id";
+$stmt = $db->prepare($sql);
+if (!$stmt) {
+    error_log('Prepare failed: ' . print_r($db->errorInfo(), true));
+    return null;
+}
+$stmt->execute(['id' => $matchId]);
+$result = $stmt->fetch();
+
+// ❌ WRONG - SQL injection risk
+$sql = "SELECT * FROM matches WHERE id = " . $matchId;
+$result = $db->query($sql);
+```
+
+### Transaction Safety
+
+```php
+// ✅ CORRECT - Use transactions for multiple queries
+try {
+    $db->beginTransaction();
+    
+    $stmt1 = $db->prepare($sql1);
+    $stmt1->execute($params1);
+    
+    $stmt2 = $db->prepare($sql2);
+    $stmt2->execute($params2);
+    
+    $db->commit();
+} catch (Exception $e) {
+    $db->rollBack();
+    error_log('Transaction failed: ' . $e->getMessage());
+    throw $e;
+}
+
+// ❌ WRONG - No transaction
+$stmt1->execute($params1);
+$stmt2->execute($params2); // If this fails, first query is committed
+```
+
+## 6. JavaScript Error Prevention
+
+### Variable Initialization
+
+```javascript
+// ✅ CORRECT - Initialize variables
+let matchId = 0;
+let allEvents = [];
+
+// Set from PHP
+if (typeof window.matchId !== 'undefined') {
+    matchId = window.matchId;
+}
+
+// ❌ WRONG - Undefined variables
+// matchId is used but never declared
+console.log(matchId); // ReferenceError
+```
+
+### Null/Undefined Checks
+
+```javascript
+// ✅ CORRECT - Check for null/undefined
+if (data && data.matches && Array.isArray(data.matches)) {
+    data.matches.forEach(match => {
+        // Process match
+    });
+}
+
+// ❌ WRONG - No checks
+data.matches.forEach(match => {
+    // TypeError if data.matches is undefined
+});
+```
+
+### API Call Safety
+
+```javascript
+// ✅ CORRECT - Handle errors
+async function fetchData() {
+    try {
+        const response = await fetch('/api/v1/matches');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        return null;
+    }
+}
+
+// ❌ WRONG - No error handling
+const response = await fetch('/api/v1/matches');
+const data = await response.json(); // May fail
+```
+
+## 7. CSS Error Prevention
+
+### Avoid Common Mistakes
+
+```css
+/* ✅ CORRECT - Use proper units */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 1rem;
+}
+
+/* ❌ WRONG - Invalid units */
+.container {
+    width: 100px + 20px; /* Invalid syntax */
+    padding: 1rem 2rem 3rem 4rem 5rem; /* Too many values */
+}
+```
+
+### Media Query Syntax
+
+```css
+/* ✅ CORRECT - Proper media query syntax */
+@media (min-width: 768px) {
+    .container {
+        padding: 1.5rem;
+    }
+}
+
+/* ❌ WRONG - Syntax errors */
+@media min-width: 768px { /* Missing parentheses */
+    .container {
+        padding: 1.5rem;
+    }
+}
+```
+
+## 8. File Inclusion Safety
+
+### Require Once Pattern
+
+```php
+// ✅ CORRECT - Check if file exists
+$configFile = __DIR__ . '/../includes/config.php';
+if (file_exists($configFile)) {
+    require_once $configFile;
+} else {
+    error_log('Config file not found: ' . $configFile);
+    die('Configuration error');
+}
+
+// ❌ WRONG - No check
+require_once __DIR__ . '/../includes/config.php'; // Fatal error if missing
+```
+
+### Autoloader Safety
+
+```php
+// ✅ CORRECT - Check class exists after autoload
+if (!class_exists('MatchModel')) {
+    require_once __DIR__ . '/../classes/Match.php';
+}
+
+$matchModel = new MatchModel();
+
+// ❌ WRONG - Assume class exists
+$matchModel = new MatchModel(); // Fatal error if class not found
+```
+
+## 9. Error Logging
+
+### Log All Errors
+
+```php
+// ✅ CORRECT - Log errors appropriately
+try {
+    $result = riskyOperation();
+} catch (Exception $e) {
+    error_log('Operation failed: ' . $e->getMessage());
+    error_log('Stack trace: ' . $e->getTraceAsString());
+    // Handle error gracefully
+    return null;
+}
+
+// ❌ WRONG - Silent failures
+try {
+    $result = riskyOperation();
+} catch (Exception $e) {
+    // Error is swallowed, no logging
+}
+```
+
+### Development vs Production
+
+```php
+// ✅ CORRECT - Different error handling
+if ($isProduction) {
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+} else {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    ini_set('log_errors', 1);
+}
+
+// ❌ WRONG - Show errors in production
+ini_set('display_errors', 1); // Security risk
+```
+
+## 10. Validation Checklist
+
+### Before Committing
+
+- [ ] **Syntax check**: Run `php -l` on all PHP files
+- [ ] **Path validation**: Verify all `require_once` paths exist
+- [ ] **Null checks**: All array/object access has null checks
+- [ ] **Input validation**: All user input is validated
+- [ ] **Error handling**: All database queries have error handling
+- [ ] **SQL injection**: All queries use prepared statements
+- [ ] **XSS prevention**: All output is escaped with `htmlspecialchars()`
+- [ ] **Mobile testing**: Test responsive design on mobile
+- [ ] **Browser testing**: Test in Chrome, Firefox, Safari
+- [ ] **Error logging**: Errors are logged appropriately
+
+## 11. Common Error Patterns to Avoid
+
+### Pattern 1: Undefined Index
+
+```php
+// ❌ WRONG
+$name = $_GET['name']; // Undefined index notice
+
+// ✅ CORRECT
+$name = $_GET['name'] ?? '';
+```
+
+### Pattern 2: Type Mismatch
+
+```php
+// ❌ WRONG
+$id = $_GET['id'];
+$sql = "SELECT * FROM matches WHERE id = $id"; // String in SQL
+
+// ✅ CORRECT
+$id = (int)($_GET['id'] ?? 0);
+$sql = "SELECT * FROM matches WHERE id = :id";
+$stmt->execute(['id' => $id]);
+```
+
+### Pattern 3: Missing Return Value
+
+```php
+// ❌ WRONG
+function getMatch($id) {
+    $stmt->execute(['id' => $id]);
+    $result = $stmt->fetch();
+    // No return if fetch fails
+}
+
+// ✅ CORRECT
+function getMatch($id) {
+    $stmt->execute(['id' => $id]);
+    $result = $stmt->fetch();
+    return $result ?: null; // Explicit return
+}
+```
+
+## 12. Automated Error Prevention
+
+### IDE Configuration
+
+- **Enable PHP error reporting** in IDE
+- **Enable JavaScript linting** in IDE
+- **Enable CSS validation** in IDE
+- **Use bracket matching** to catch unclosed brackets
+- **Use quote matching** to catch unclosed quotes
+
+### Pre-Commit Hooks
+
+```bash
+#!/bin/bash
+# Pre-commit hook to check PHP syntax
+
+for file in $(git diff --cached --name-only --diff-filter=ACM | grep '\.php$'); do
+    php -l "$file" || exit 1
+done
+```
+
+## 13. Error Recovery
+
+### Graceful Degradation
+
+```php
+// ✅ CORRECT - Graceful error handling
+function getMatchData($matchId) {
+    try {
+        $matchModel = new MatchModel();
+        $match = $matchModel->getById($matchId);
+        
+        if (!$match) {
+            error_log("Match not found: $matchId");
+            return [
+                'error' => 'Match not found',
+                'match' => null
+            ];
+        }
+        
+        return [
+            'error' => null,
+            'match' => $match
+        ];
+    } catch (Exception $e) {
+        error_log('Error getting match: ' . $e->getMessage());
+        return [
+            'error' => 'Database error',
+            'match' => null
+        ];
+    }
+}
+
+// ❌ WRONG - Fatal error on failure
+function getMatchData($matchId) {
+    $matchModel = new MatchModel();
+    $match = $matchModel->getById($matchId);
+    return $match; // May return null, causing errors downstream
+}
+```
